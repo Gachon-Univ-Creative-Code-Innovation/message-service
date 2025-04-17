@@ -1,5 +1,5 @@
-# certificate-service
-자격증 추천 서비스
+# message-service
+메시지(쪽지) 서비스
 
 ## 🧷 Git 작업 컨벤션 (Branch / Commit / PR)
 
