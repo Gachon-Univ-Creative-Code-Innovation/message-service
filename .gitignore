@@ -1,6 +1,5 @@
 *.class
 *.jar
-!gradle/wrapper/gradle-wrapper.jar
 *.war
 *.log
 
@@ -8,18 +7,18 @@
 .gradle/
 build/
 !gradle/wrapper/gradle-wrapper.jar
-# .gitignore
-src/main/resources/application.yml
+
 # IntelliJ
 .idea/
 *.iml
-.env
+out/
+
 # OS
 .DS_Store
 
 
 # Env
-src/main/resources/.env
+.env
 .env.*
 
 # Docker
