@@ -41,5 +41,14 @@ public class MessageController {
         return ApiResponse.success(SuccessCode.DATA_FETCHED, messages);
     }
 
+    // 특정 메시지 삭제
+    @DeleteMapping("/{messageId}")
+    public ApiResponse<Void> deleteMessage(@RequestHeader("X-User-Id") Long userId,
+                                           @PathVariable Long messageId) {
+        messageService.deleteMessage(userId, messageId);
+        return ApiResponse.success();
+    }
+
+
 
 }

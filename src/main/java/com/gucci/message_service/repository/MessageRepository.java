@@ -27,4 +27,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             """)
     List<Message> findConversation(@Param("userId") Long userId, @Param("targetUserId") Long targetUserId);
 
+    List<Message> findByReceiverIdAndSenderIdAndDeletedByReceiver(Long userId, Long targetUserId, boolean deletedReceiver);
+
+    List<Message> findBySenderIdAndReceiverIdAndDeletedBySender(Long userId, Long targetUserId, boolean deletedSender);
 }

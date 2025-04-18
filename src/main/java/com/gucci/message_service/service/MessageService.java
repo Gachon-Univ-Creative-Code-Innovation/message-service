@@ -1,5 +1,7 @@
 package com.gucci.message_service.service;
 
+import com.gucci.common.exception.CustomException;
+import com.gucci.common.exception.ErrorCode;
 import com.gucci.message_service.domain.Message;
 import com.gucci.message_service.dto.MessageResponseDTO;
 import com.gucci.message_service.dto.MessageRoomResponseDTO;
@@ -7,6 +9,7 @@ import com.gucci.message_service.dto.MessageSendRequestDTO;
 import com.gucci.message_service.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -53,6 +56,7 @@ public class MessageService {
         return new ArrayList<>(rooms.values());
     }
 
+    // 특정 유저(방)의 전체 메시지 조회
     public List<MessageResponseDTO> getMessagesWithTarget(Long userId, Long targetUserId) {
         List<Message> messages = messageRepository.findConversation(userId, targetUserId);
         return messages.stream()
@@ -69,5 +73,25 @@ public class MessageService {
                 .isRead(message.isRead())
                 .createdAt(message.getCreatedAt())
                 .build();
+    }
+
+
+    @Transactional
+    public void deleteMessage(Long userId, Long messageId) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
+
+        if (message.getSenderId().equals(userId)) {
+            message.markAsDeleteBySender();
+        } else if (message.getReceiverId().equals(userId)) {
+            message.markAsDeleteByReceiver();
+        } else {
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+
+        // 두 사용자에게서 삭제 되었으면 실제 DB에서 삭제
+        if (message.isDeletedBySender() && message.isDeletedByReceiver()) {
+            messageRepository.delete(message);
+        }
     }
 }

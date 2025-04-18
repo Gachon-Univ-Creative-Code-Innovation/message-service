@@ -46,6 +46,14 @@ public class Message {
         }
     }
 
+    public void markAsDeleteByReceiver() {
+        this.deletedByReceiver = true;
+    }
+
+    public void markAsDeleteBySender() {
+        this.deletedByReceiver = true;
+    }
+
     public void markAsRead() {
         this.isRead = true;
     }
