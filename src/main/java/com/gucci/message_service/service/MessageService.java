@@ -52,4 +52,22 @@ public class MessageService {
 
         return new ArrayList<>(rooms.values());
     }
+
+    public List<MessageResponseDTO> getMessagesWithTarget(Long userId, Long targetUserId) {
+        List<Message> messages = messageRepository.findConversation(userId, targetUserId);
+        return messages.stream()
+                .map(this::convertToDTO)
+                .toList();
+    }
+
+    private MessageResponseDTO convertToDTO(Message message) {
+        return MessageResponseDTO.builder()
+                .id(message.getId())
+                .receiverId(message.getReceiverId())
+                .senderId(message.getSenderId())
+                .content(message.getContent())
+                .isRead(message.isRead())
+                .createdAt(message.getCreatedAt())
+                .build();
+    }
 }
