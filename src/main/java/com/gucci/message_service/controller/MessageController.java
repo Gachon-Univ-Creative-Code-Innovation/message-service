@@ -49,6 +49,13 @@ public class MessageController {
         return ApiResponse.success();
     }
 
+    // 방 나가기 (특정 유저와의 메시지 전체 삭제(논리적))
+    @PostMapping("/room/exit/{targetUserId}")
+    public ApiResponse<Void> exitRoomWithTarget(@RequestHeader("X-User-Id") Long userId,
+                                                @PathVariable Long targetUserId) {
+        messageService.exitRoomWithTarget(userId, targetUserId);
+        return ApiResponse.success();
+    }
 
 
 }

@@ -75,6 +75,37 @@ public class MessageService {
                 .build();
     }
 
+    // 특정 유저와의 대화 전체 삭제
+    @Transactional
+    public void exitRoomWithTarget(Long userId, Long targetUserId) {
+        // 보낸 메시지
+        List<Message> sentMessages = messageRepository.findByReceiverIdAndSenderIdAndDeletedByReceiverFalse(userId, targetUserId);
+
+        // 받은 메시지
+        List<Message> receivedMessages = messageRepository.findBySenderIdAndReceiverIdAndDeletedBySenderFalse(userId, targetUserId);
+
+        for (Message message : sentMessages) {
+            message.markAsDeleteBySender();
+        }
+
+        for (Message message : receivedMessages) {
+            message.markAsDeleteByReceiver();
+        }
+
+        // 두 사용자에게 삭제된 메시지 DB에서 삭제
+        List<Message> toDelete = new ArrayList<>();
+
+        toDelete.addAll(sentMessages.stream()
+                .filter(message -> message.isDeletedBySender() && message.isDeletedByReceiver())
+                .toList());
+
+
+        toDelete.addAll(receivedMessages.stream()
+                .filter(message -> message.isDeletedBySender() && message.isDeletedByReceiver())
+                .toList());
+
+        messageRepository.deleteAll(toDelete);
+    }
 
     @Transactional
     public void deleteMessage(Long userId, Long messageId) {
