@@ -57,8 +57,17 @@ public class MessageService {
     }
 
     // 특정 유저(방)의 전체 메시지 조회
+    @Transactional
     public List<MessageResponseDTO> getMessagesWithTarget(Long userId, Long targetUserId) {
         List<Message> messages = messageRepository.findConversation(userId, targetUserId);
+
+        // 방 입장 시 전체 읽음 처리
+        for(Message message : messages){
+            if (message.getReceiverId().equals(userId) && !message.isRead()) {
+                message.markAsRead();
+            }
+        }
+
         return messages.stream()
                 .map(this::convertToDTO)
                 .toList();
