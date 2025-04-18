@@ -14,4 +14,5 @@ public class MessageRoomResponseDTO {
     private String targetNickname; // 상대방 이름
     private String lastMessage;
     private LocalDateTime lastMessageTime;
+    private Long unreadCount;
 }

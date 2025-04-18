@@ -45,11 +45,13 @@ public class MessageService {
             // 이미 맵에 등록됐으면 스킵
             if(rooms.containsKey(targetId)) continue;
 
+            long unreadCount = messageRepository.countBySenderIdAndReceiverIdAndIsReadFalse(targetId, userId);
             rooms.put(targetId, MessageRoomResponseDTO.builder()
                     .targetUserId(targetId)
                     .targetNickname("닉네임") // JWT에서 닉네임 가져오기
                     .lastMessage(message.getContent())
                     .lastMessageTime(message.getCreatedAt())
+                    .unreadCount(unreadCount)
                     .build());
         }
 
