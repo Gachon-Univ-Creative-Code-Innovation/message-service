@@ -51,7 +51,7 @@ public class Message {
     }
 
     public void markAsDeleteBySender() {
-        this.deletedByReceiver = true;
+        this.deletedBySender = true;
     }
 
     public void markAsRead() {

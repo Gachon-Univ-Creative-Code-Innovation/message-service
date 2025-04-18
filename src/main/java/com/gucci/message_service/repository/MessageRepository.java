@@ -11,8 +11,8 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     // 삭제되지 않은 메시지 전부 최신순으로 반환
     @Query("""
             SELECT m FROM Message m
-            WHERE (m.receiverId = :userId OR m.senderId = :userId)
-            AND (m.deletedByReceiver = false OR m.deletedBySender = false)
+            WHERE (m.receiverId = :userId AND m.deletedByReceiver = false)
+            OR (m.senderId = :userId AND m.deletedBySender = false)
             ORDER BY m.createdAt DESC
             """)
     List<Message> findAllRelatedMessages(@Param("userId") Long userId);
