@@ -35,4 +35,5 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     long countBySenderIdAndReceiverIdAndIsReadFalse(Long senderId, Long receiverId);
 
+    long countByReceiverIdAndIsReadFalseAndDeletedByReceiverFalse(Long userId);
 }

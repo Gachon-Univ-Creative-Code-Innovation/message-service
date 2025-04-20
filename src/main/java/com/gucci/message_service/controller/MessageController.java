@@ -36,7 +36,7 @@ public class MessageController {
     // 특정 유저와의 전체 메시지 조회
     @GetMapping("/with/{targetUserId}")
     public ApiResponse<List<MessageResponseDTO>> getMessagesWithTarget(@RequestHeader("X-User-Id") Long userId,
-                                                             @PathVariable Long targetUserId) {
+                                                                       @PathVariable Long targetUserId) {
         List<MessageResponseDTO> messages = messageService.getMessagesWithTarget(userId, targetUserId);
         return ApiResponse.success(SuccessCode.DATA_FETCHED, messages);
     }
@@ -57,5 +57,9 @@ public class MessageController {
         return ApiResponse.success();
     }
 
-
+    // 전체 안 읽은 메시지 수 조회
+    @GetMapping("/count/unread")
+    public ApiResponse<Long> getUnreadCount(@RequestHeader("X-User-Id") Long userId) {
+        return ApiResponse.success(messageService.getAllUnreadCount(userId));
+    }
 }

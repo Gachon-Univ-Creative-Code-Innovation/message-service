@@ -136,4 +136,8 @@ public class MessageService {
             messageRepository.delete(message);
         }
     }
+
+    public long getAllUnreadCount(Long userId) {
+        return messageRepository.countByReceiverIdAndIsReadFalseAndDeletedByReceiverFalse(userId);
+    }
 }
