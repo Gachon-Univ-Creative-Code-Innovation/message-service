@@ -45,11 +45,13 @@ public class MessageService {
             // 이미 맵에 등록됐으면 스킵
             if(rooms.containsKey(targetId)) continue;
 
+            long unreadCount = messageRepository.countBySenderIdAndReceiverIdAndIsReadFalse(targetId, userId);
             rooms.put(targetId, MessageRoomResponseDTO.builder()
                     .targetUserId(targetId)
                     .targetNickname("닉네임") // JWT에서 닉네임 가져오기
                     .lastMessage(message.getContent())
                     .lastMessageTime(message.getCreatedAt())
+                    .unreadCount(unreadCount)
                     .build());
         }
 
@@ -57,8 +59,17 @@ public class MessageService {
     }
 
     // 특정 유저(방)의 전체 메시지 조회
+    @Transactional
     public List<MessageResponseDTO> getMessagesWithTarget(Long userId, Long targetUserId) {
         List<Message> messages = messageRepository.findConversation(userId, targetUserId);
+
+        // 방 입장 시 전체 읽음 처리
+        for(Message message : messages){
+            if (message.getReceiverId().equals(userId) && !message.isRead()) {
+                message.markAsRead();
+            }
+        }
+
         return messages.stream()
                 .map(this::convertToDTO)
                 .toList();
@@ -124,5 +135,9 @@ public class MessageService {
         if (message.isDeletedBySender() && message.isDeletedByReceiver()) {
             messageRepository.delete(message);
         }
+    }
+
+    public long getAllUnreadCount(Long userId) {
+        return messageRepository.countByReceiverIdAndIsReadFalseAndDeletedByReceiverFalse(userId);
     }
 }
