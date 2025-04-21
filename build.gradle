@@ -33,6 +33,11 @@ dependencies {
 	implementation 'com.github.Gachon-Univ-Creative-Code-Innovation:alog-common:v1.0.2'
 	implementation 'me.paulschwarz:spring-dotenv:3.0.0'
 	implementation 'org.postgresql:postgresql:42.6.0'
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5' // Jackson serializer 사용
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	testImplementation 'org.springframework.security:spring-security-test'
 }
 
 tasks.named('test') {
