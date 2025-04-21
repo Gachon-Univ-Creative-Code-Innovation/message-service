@@ -37,6 +37,13 @@ public class JwtProvider {
         return userId;
     }
 
+    // JWT에서 사용자 닉네임 추출
+    public String getNickname(String token) {
+        String nickname = parseClaims(token).get("nickname", String.class);
+        log.info("Nickname: {}", nickname);
+        return nickname;
+    }
+
     // 토큰의 유효성 검사
     public boolean validateToken(String token) {
         try {
