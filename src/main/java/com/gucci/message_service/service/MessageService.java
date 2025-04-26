@@ -2,6 +2,7 @@ package com.gucci.message_service.service;
 
 import com.gucci.common.exception.CustomException;
 import com.gucci.common.exception.ErrorCode;
+import com.gucci.message_service.client.UserClient;
 import com.gucci.message_service.domain.Message;
 import com.gucci.message_service.dto.MessageResponseDTO;
 import com.gucci.message_service.dto.MessageRoomResponseDTO;
@@ -18,6 +19,7 @@ import java.util.*;
 public class MessageService {
 
     private final MessageRepository messageRepository;
+    private final UserClient userClient;
 
     // 메시지 전송
     public void send(Long senderId, MessageSendRequestDTO request) {
@@ -48,7 +50,7 @@ public class MessageService {
             long unreadCount = messageRepository.countBySenderIdAndReceiverIdAndIsReadFalse(targetId, userId);
             rooms.put(targetId, MessageRoomResponseDTO.builder()
                     .targetUserId(targetId)
-                    .targetNickname("닉네임") // JWT에서 닉네임 가져오기
+                    .targetNickname(getTargetNickname(targetId))
                     .lastMessage(message.getContent())
                     .lastMessageTime(message.getCreatedAt())
                     .unreadCount(unreadCount)
@@ -139,5 +141,10 @@ public class MessageService {
 
     public long getAllUnreadCount(Long userId) {
         return messageRepository.countByReceiverIdAndIsReadFalseAndDeletedByReceiverFalse(userId);
+    }
+
+    // 닉네임 추출
+    private String getTargetNickname(Long targetUserId) {
+        return userClient.getNicknameById(targetUserId).getData();
     }
 }
