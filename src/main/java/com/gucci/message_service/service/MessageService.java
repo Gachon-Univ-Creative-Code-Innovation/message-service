@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +38,18 @@ public class MessageService {
         // 로그인 한 유저의 삭제되지 않은 메시지 전체 조회
         List<Message> allMessages = messageRepository.findAllRelatedMessages(userId);
 
+        // 내 전체 메시지에 존재하는 상대방의 ID 전부 추출
+        Set<Long> targetIds = allMessages.stream()
+                .map(m -> m.getSenderId().equals(userId) ? m.getReceiverId() : m.getSenderId())
+                .collect(Collectors.toSet());
+
+        // 모든 안 읽은 메시지 카운트
+        Map<Long, Long> unreadCounts = countUnreadMessages(userId, targetIds);
+
+        //닉네임 리스트로 가져오기 (FeignClient)
+        Map<Long, String> nicknameMap = userClient.getNicknamesByIds(new ArrayList<>(targetIds)).getData();
+
+        // 각 방별로 응답 보내기
         Map<Long, MessageRoomResponseDTO> rooms = new LinkedHashMap<>();
 
         for (Message message : allMessages) {
@@ -44,20 +57,30 @@ public class MessageService {
                     ? message.getReceiverId()
                     : message.getSenderId();
 
-            // 이미 맵에 등록됐으면 스킵
-            if(rooms.containsKey(targetId)) continue;
+            // 이미 추가되어있는 사용자면 건너 뜀
+            if (rooms.containsKey(targetId)) {
+                continue;
+            }
 
-            long unreadCount = messageRepository.countBySenderIdAndReceiverIdAndIsReadFalse(targetId, userId);
             rooms.put(targetId, MessageRoomResponseDTO.builder()
                     .targetUserId(targetId)
-                    .targetNickname(getTargetNickname(targetId))
+                    .targetNickname(nicknameMap.getOrDefault(targetId,"알 수 없음"))
                     .lastMessage(message.getContent())
                     .lastMessageTime(message.getCreatedAt())
-                    .unreadCount(unreadCount)
+                    .unreadCount(unreadCounts.getOrDefault(targetId, 0L))
                     .build());
         }
 
         return new ArrayList<>(rooms.values());
+    }
+
+    private Map<Long, Long> countUnreadMessages(Long userId, Set<Long> targetIds) {
+        List<Object[]> unreadCountsList = messageRepository.countUnreadMessages(userId, targetIds);
+        return unreadCountsList.stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0], // senderId
+                        row -> (Long) row[1]  // count
+                ));
     }
 
     // 특정 유저(방)의 전체 메시지 조회
@@ -141,10 +164,5 @@ public class MessageService {
 
     public long getAllUnreadCount(Long userId) {
         return messageRepository.countByReceiverIdAndIsReadFalseAndDeletedByReceiverFalse(userId);
-    }
-
-    // 닉네임 추출
-    private String getTargetNickname(Long targetUserId) {
-        return userClient.getNicknameById(targetUserId).getData();
     }
 }
