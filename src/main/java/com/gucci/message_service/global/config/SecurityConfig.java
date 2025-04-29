@@ -1,4 +1,4 @@
-package com.gucci.message_service.config;
+package com.gucci.message_service.global.config;
 
 import com.gucci.message_service.auth.JwtAuthenticationFilter;
 import com.gucci.message_service.auth.JwtProvider;
