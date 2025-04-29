@@ -86,14 +86,11 @@ public class MessageService {
     // 특정 유저(방)의 전체 메시지 조회
     @Transactional
     public List<MessageResponseDTO> getMessagesWithTarget(Long userId, Long targetUserId) {
-        List<Message> messages = messageRepository.findConversation(userId, targetUserId);
-
         // 방 입장 시 전체 읽음 처리
-        for(Message message : messages){
-            if (message.getReceiverId().equals(userId) && !message.isRead()) {
-                message.markAsRead();
-            }
-        }
+        messageRepository.markAllMessagesAsRead(userId, targetUserId);
+
+        // 최신 순으로 전체 메시지 조회
+        List<Message> messages = messageRepository.findConversation(userId, targetUserId);
 
         return messages.stream()
                 .map(this::convertToDTO)
@@ -106,6 +103,7 @@ public class MessageService {
                 .receiverId(message.getReceiverId())
                 .senderId(message.getSenderId())
                 .content(message.getContent())
+                .messageType(message.getMessageType())
                 .isRead(message.isRead())
                 .createdAt(message.getCreatedAt())
                 .build();

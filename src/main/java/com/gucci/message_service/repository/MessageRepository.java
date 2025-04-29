@@ -2,8 +2,10 @@ package com.gucci.message_service.repository;
 
 import com.gucci.message_service.domain.Message;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -48,4 +50,12 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             """)
     List<Object[]> countUnreadMessages(@Param("userId") Long userId, @Param("targetIds") Set<Long> targetIds);
 
+    // UPDATE Message m SET is READ = TRUE WHERE senderId = targetUserId AND receiverId = userId AND isRead = FALSE
+
+    @Modifying(clearAutomatically = true) // 변경 후 캐시 자동 비움
+    @Query("""
+        UPDATE Message m SET m.isRead = true
+        WHERE m.receiverId = :userId AND m.senderId = :targetUserId AND m.isRead = false
+        """)
+    void markAllMessagesAsRead(@Param("userId") Long userId,@Param("targetUserId") Long targetUserId);
 }
