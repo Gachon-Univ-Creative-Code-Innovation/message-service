@@ -28,6 +28,10 @@ public class Message {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private MessageType messageType;
+
     @Column(columnDefinition = "BOOLEAN DEFAULT false")
     private boolean isRead;
 

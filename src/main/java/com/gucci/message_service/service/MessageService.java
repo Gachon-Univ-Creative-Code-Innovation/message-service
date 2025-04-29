@@ -6,7 +6,7 @@ import com.gucci.message_service.client.UserClient;
 import com.gucci.message_service.domain.Message;
 import com.gucci.message_service.dto.MessageResponseDTO;
 import com.gucci.message_service.dto.MessageRoomResponseDTO;
-import com.gucci.message_service.dto.MessageSendRequestDTO;
+import com.gucci.message_service.dto.WebSocketMessageRequestDTO;
 import com.gucci.message_service.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ public class MessageService {
     private final UserClient userClient;
 
     // 메시지 전송
-    public void send(Long senderId, MessageSendRequestDTO request) {
+    public void send(Long senderId, WebSocketMessageRequestDTO request) {
         Message message = Message.builder()
                 .senderId(senderId)
                 .receiverId(request.getReceiverId())
