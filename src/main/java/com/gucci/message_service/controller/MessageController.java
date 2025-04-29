@@ -4,7 +4,6 @@ import com.gucci.common.response.ApiResponse;
 import com.gucci.common.response.SuccessCode;
 import com.gucci.message_service.dto.MessageResponseDTO;
 import com.gucci.message_service.dto.MessageRoomResponseDTO;
-import com.gucci.message_service.dto.WebSocketMessageRequestDTO;
 import com.gucci.message_service.service.AuthServiceHelper;
 import com.gucci.message_service.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -20,15 +19,6 @@ public class MessageController {
 
     private final MessageService messageService;
     private final AuthServiceHelper authServiceHelper;
-
-//    // 메시지 전송 WebSocket 에서 처리
-//    @PostMapping("/send")
-//    public ApiResponse<Void> send(Authentication authentication,
-//                                  @RequestBody WebSocketMessageRequestDTO message) {
-//        Long senderId = authServiceHelper.getCurrentUserId(authentication);
-//        messageService.send(senderId, message);
-//        return ApiResponse.success();
-//    }
 
     // 방 리스트 조회
     @GetMapping("/rooms")

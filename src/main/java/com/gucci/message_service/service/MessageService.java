@@ -22,17 +22,6 @@ public class MessageService {
     private final MessageRepository messageRepository;
     private final UserClient userClient;
 
-    // 메시지 전송
-    public void send(Long senderId, WebSocketMessageRequestDTO request) {
-        Message message = Message.builder()
-                .senderId(senderId)
-                .receiverId(request.getReceiverId())
-                .content(request.getContent())
-                .build();
-
-        messageRepository.save(message);
-    }
-
     // 방 리스트 조회
     public List<MessageRoomResponseDTO> getRooms(Long userId) {
         // 로그인 한 유저의 삭제되지 않은 메시지 전체 조회
