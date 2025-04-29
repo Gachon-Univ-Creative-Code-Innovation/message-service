@@ -58,18 +58,19 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             return;
         }
 
-
-
         WebSocketSession receiverSession = userSessions.get(request.getReceiverId());
+
+        Message savedMessage = messageRepository.save(
+                Message.builder()
+                        .senderId(senderId)
+                        .receiverId(request.getReceiverId())
+                        .messageType(request.getMessageType())
+                        .content(request.getContent())
+                        .build()
+        );
+
         if (receiverSession != null && receiverSession.isOpen()) {
-            Message savedMessage = messageRepository.save(
-                    Message.builder()
-                            .senderId(senderId)
-                            .receiverId(request.getReceiverId())
-                            .messageType(request.getMessageType())
-                            .content(request.getContent())
-                            .build()
-            );
+
 
             receiverSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(savedMessage)));
             log.info("메시지를 보냈습니다. message: {}, type: {}", savedMessage.getContent(), savedMessage.getMessageType());
