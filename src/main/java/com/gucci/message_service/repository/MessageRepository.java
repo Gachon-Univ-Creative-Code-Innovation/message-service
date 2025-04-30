@@ -58,4 +58,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
         WHERE m.receiverId = :userId AND m.senderId = :targetUserId AND m.isRead = false
         """)
     void markAllMessagesAsRead(@Param("userId") Long userId,@Param("targetUserId") Long targetUserId);
+
+    // 수신자의 전체 안 읽은 메시지 수
+    long countByReceiverIdAndIsReadFalse(Long receiverId);
 }
