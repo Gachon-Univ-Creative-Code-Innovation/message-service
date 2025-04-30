@@ -50,8 +50,6 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             """)
     List<Object[]> countUnreadMessages(@Param("userId") Long userId, @Param("targetIds") Set<Long> targetIds);
 
-    // UPDATE Message m SET is READ = TRUE WHERE senderId = targetUserId AND receiverId = userId AND isRead = FALSE
-
     @Modifying(clearAutomatically = true) // 변경 후 캐시 자동 비움
     @Query("""
         UPDATE Message m SET m.isRead = true

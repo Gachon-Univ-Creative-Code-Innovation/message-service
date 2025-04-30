@@ -1,4 +1,4 @@
-package com.gucci.message_service.global.handler;
+package com.gucci.message_service.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gucci.message_service.auth.JwtProvider;
