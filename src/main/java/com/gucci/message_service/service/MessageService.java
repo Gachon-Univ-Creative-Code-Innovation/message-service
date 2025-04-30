@@ -116,6 +116,10 @@ public class MessageService {
         }
 
 
+        // 읽음 처리 추가
+        messageRepository.markAllMessagesAsRead(userId, targetUserId);
+
+
         // 두 사용자에게 삭제된 메시지 DB에서 삭제
         List<Message> toDelete = new ArrayList<>();
 
