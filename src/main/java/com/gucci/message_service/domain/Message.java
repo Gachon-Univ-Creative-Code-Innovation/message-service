@@ -58,8 +58,4 @@ public class Message {
         this.deletedBySender = true;
     }
 
-    public void markAsRead() {
-        this.isRead = true;
-    }
-
 }

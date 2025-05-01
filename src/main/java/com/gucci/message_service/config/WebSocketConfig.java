@@ -1,6 +1,6 @@
-package com.gucci.message_service.global.config;
+package com.gucci.message_service.config;
 
-import com.gucci.message_service.global.handler.ChatWebSocketHandler;
+import com.gucci.message_service.websocket.ChatWebSocketHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;

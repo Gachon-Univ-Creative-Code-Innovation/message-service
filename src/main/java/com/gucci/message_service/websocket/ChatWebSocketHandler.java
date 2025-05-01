@@ -1,9 +1,10 @@
-package com.gucci.message_service.global.handler;
+package com.gucci.message_service.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gucci.message_service.auth.JwtProvider;
 import com.gucci.message_service.domain.Message;
 import com.gucci.message_service.dto.WebSocketMessageRequestDTO;
+import com.gucci.message_service.dto.WebSocketMessageResponseDTO;
 import com.gucci.message_service.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,20 +59,38 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             return;
         }
 
-
-
         WebSocketSession receiverSession = userSessions.get(request.getReceiverId());
-        if (receiverSession != null && receiverSession.isOpen()) {
-            Message savedMessage = messageRepository.save(
-                    Message.builder()
-                            .senderId(senderId)
-                            .receiverId(request.getReceiverId())
-                            .messageType(request.getMessageType())
-                            .content(request.getContent())
-                            .build()
-            );
 
-            receiverSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(savedMessage)));
+        Message savedMessage = messageRepository.save(
+                Message.builder()
+                        .senderId(senderId)
+                        .receiverId(request.getReceiverId())
+                        .messageType(request.getMessageType())
+                        .content(request.getContent())
+                        .build()
+        );
+
+        // 이 채팅방 안 읽은 메시지 수
+        long unreadCount = messageRepository.countBySenderIdAndReceiverIdAndIsReadFalse(senderId, request.getReceiverId());
+
+        // 전체 채팅방 안 읽은 메시지 수
+        long totalUnreadCount = messageRepository.countByReceiverIdAndIsReadFalse(request.getReceiverId());
+
+        WebSocketMessageResponseDTO responseDTO = WebSocketMessageResponseDTO.builder()
+                .id(savedMessage.getId())
+                .senderId(savedMessage.getSenderId())
+                .receiverId(savedMessage.getReceiverId())
+                .content(savedMessage.getContent())
+                .messageType(savedMessage.getMessageType())
+                .isRead(savedMessage.isRead())
+                .createdAt(savedMessage.getCreatedAt())
+                .unreadCount(unreadCount)
+                .totalUnreadCount(totalUnreadCount)
+                .build();
+
+
+        if (receiverSession != null && receiverSession.isOpen()) {
+            receiverSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(responseDTO)));
             log.info("메시지를 보냈습니다. message: {}, type: {}", savedMessage.getContent(), savedMessage.getMessageType());
         } else {
             log.warn("연결되지 않거나 없는 사용자에게 메시지를 보냈습니다.");

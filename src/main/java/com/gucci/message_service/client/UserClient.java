@@ -1,7 +1,7 @@
 package com.gucci.message_service.client;
 
 import com.gucci.common.response.ApiResponse;
-import com.gucci.message_service.global.config.FeignConfig;
+import com.gucci.message_service.config.FeignConfig;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
