@@ -6,7 +6,6 @@ import com.gucci.message_service.client.UserClient;
 import com.gucci.message_service.domain.Message;
 import com.gucci.message_service.dto.MessageResponseDTO;
 import com.gucci.message_service.dto.MessageRoomResponseDTO;
-import com.gucci.message_service.dto.WebSocketMessageRequestDTO;
 import com.gucci.message_service.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,10 +34,10 @@ public class MessageService {
         // 모든 안 읽은 메시지 카운트
         Map<Long, Long> unreadCounts = countUnreadMessages(userId, targetIds);
 
-        //닉네임 리스트로 가져오기 (FeignClient)
+        // 닉네임 리스트로 가져오기 (FeignClient)
         Map<Long, String> nicknameMap = userClient.getNicknamesByIds(new ArrayList<>(targetIds)).getData();
 
-        // 각 방별로 응답 보내기
+        // 각 방 별로 최신 메시지만 담기
         Map<Long, MessageRoomResponseDTO> rooms = new LinkedHashMap<>();
 
         for (Message message : allMessages) {
@@ -86,49 +85,19 @@ public class MessageService {
                 .toList();
     }
 
-    private MessageResponseDTO convertToDTO(Message message) {
-        return MessageResponseDTO.builder()
-                .id(message.getId())
-                .receiverId(message.getReceiverId())
-                .senderId(message.getSenderId())
-                .content(message.getContent())
-                .messageType(message.getMessageType())
-                .isRead(message.isRead())
-                .createdAt(message.getCreatedAt())
-                .build();
-    }
-
     // 특정 유저와의 대화 전체 삭제
     @Transactional
     public void exitRoomWithTarget(Long userId, Long targetUserId) {
-        // 받은 메시지
-        List<Message> receivedMessages = messageRepository.findByReceiverIdAndSenderIdAndDeletedByReceiverFalse(userId, targetUserId);
+        // 받은 & 보낸 메시지 소프트 삭제
+        messageRepository.softDeleteReceivedMessage(userId, targetUserId);
+        messageRepository.softDeleteSentMessages(userId, targetUserId);
 
-        // 보낸 메시지
-        List<Message> sentMessages = messageRepository.findBySenderIdAndReceiverIdAndDeletedBySenderFalse(userId, targetUserId);
-
-        for (Message message : receivedMessages) {
-            message.markAsDeleteByReceiver();
-        }
-
-        for (Message message : sentMessages) {
-            message.markAsDeleteBySender();
-        }
-
-
-        // 읽음 처리 추가
+        // 읽음 처리
         messageRepository.markAllMessagesAsRead(userId, targetUserId);
 
-
         // 두 사용자에게 삭제된 메시지 DB에서 삭제
-        List<Message> toDelete = new ArrayList<>();
-
-        toDelete.addAll(sentMessages.stream()
-                .filter(message -> message.isDeletedBySender() && message.isDeletedByReceiver())
-                .toList());
-
-
-        toDelete.addAll(receivedMessages.stream()
+        List<Message> conversationAll = messageRepository.findConversationAll(userId, targetUserId);
+        List<Message> toDelete = new ArrayList<>(conversationAll.stream()
                 .filter(message -> message.isDeletedBySender() && message.isDeletedByReceiver())
                 .toList());
 
@@ -156,5 +125,17 @@ public class MessageService {
 
     public long getAllUnreadCount(Long userId) {
         return messageRepository.countByReceiverIdAndIsReadFalseAndDeletedByReceiverFalse(userId);
+    }
+
+    private MessageResponseDTO convertToDTO(Message message) {
+        return MessageResponseDTO.builder()
+                .id(message.getId())
+                .receiverId(message.getReceiverId())
+                .senderId(message.getSenderId())
+                .content(message.getContent())
+                .messageType(message.getMessageType())
+                .isRead(message.isRead())
+                .createdAt(message.getCreatedAt())
+                .build();
     }
 }
