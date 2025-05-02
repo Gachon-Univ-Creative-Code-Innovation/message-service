@@ -4,10 +4,7 @@ import com.gucci.common.response.ApiResponse;
 import com.gucci.message_service.dto.PresignedUrlResponseDTO;
 import com.gucci.message_service.service.S3Service;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,8 +14,14 @@ public class S3Controller {
     private final S3Service s3Service;
 
     @PostMapping("/upload-url")
-    public ApiResponse<PresignedUrlResponseDTO> getPresignedUrl(@RequestParam String fileName) {
+    public ApiResponse<PresignedUrlResponseDTO> createPresignedUrl(@RequestParam String fileName) {
         PresignedUrlResponseDTO url = s3Service.generatePresignedUploadUrl(fileName);
         return ApiResponse.success(url);
+    }
+
+    @GetMapping("/image-url")
+    public ApiResponse<String> getPresignedUrl(@RequestParam String objectUrl) {
+        String presignedUrl = s3Service.getPresignedUrl(objectUrl);
+        return ApiResponse.success(presignedUrl);
     }
 }

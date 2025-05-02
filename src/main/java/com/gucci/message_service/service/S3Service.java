@@ -4,8 +4,11 @@ import com.gucci.message_service.config.S3Config;
 import com.gucci.message_service.dto.PresignedUrlResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
@@ -25,7 +28,6 @@ public class S3Service {
 
     public PresignedUrlResponseDTO generatePresignedUploadUrl(String fileName) {
         String bucketName = s3Config.getBucketName();
-        String region = s3Config.getRegion();
 
         String encodedName = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
         String objectKey = FOLDER_PREFIX + UUID.randomUUID() + "-" + encodedName;
@@ -42,13 +44,28 @@ public class S3Service {
 
         PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(presignRequest);
 
-        String objectUrl = "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + objectKey;
-
         return PresignedUrlResponseDTO.builder()
                 .presignedUrl(presignedRequest.url().toString())
-                .s3ObjectUrl(objectUrl)
+                .s3ObjectUrl(objectKey)
                 .build();
     }
 
 
+    public String getPresignedUrl(String objectUrl) {
+        String bucketName = s3Config.getBucketName();
+
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(objectUrl)
+                .build();
+
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .getObjectRequest(getObjectRequest)
+                .signatureDuration(Duration.ofMinutes(PRESIGNED_EXPIRATION))
+                .build();
+
+        PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(presignRequest);
+
+        return presignedRequest.url().toString();
+    }
 }
