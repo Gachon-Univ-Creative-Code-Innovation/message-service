@@ -29,8 +29,7 @@ public class S3Service {
     public PresignedUrlResponseDTO generatePresignedUploadUrl(String fileName) {
         String bucketName = s3Config.getBucketName();
 
-        String encodedName = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
-        String objectKey = FOLDER_PREFIX + UUID.randomUUID() + "-" + encodedName;
+        String objectKey = FOLDER_PREFIX + UUID.randomUUID() + "-" + fileName;
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
