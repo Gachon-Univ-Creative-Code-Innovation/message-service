@@ -4,6 +4,8 @@ import com.gucci.message_service.config.S3Config;
 import com.gucci.message_service.dto.PresignedUrlResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -25,6 +27,7 @@ public class S3Service {
 
     private final S3Presigner s3Presigner;
     private final S3Config s3Config;
+    private final S3Client s3Client;
 
     public PresignedUrlResponseDTO generatePresignedUploadUrl(String fileName) {
         String bucketName = s3Config.getBucketName();
@@ -66,5 +69,14 @@ public class S3Service {
         PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(presignRequest);
 
         return presignedRequest.url().toString();
+    }
+
+    public void deleteFile(String objectKey) {
+        DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
+                .bucket(s3Config.getBucketName())
+                .key(objectKey)
+                .build();
+
+        s3Client.deleteObject(deleteRequest);
     }
 }

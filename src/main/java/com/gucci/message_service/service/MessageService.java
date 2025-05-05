@@ -4,6 +4,7 @@ import com.gucci.common.exception.CustomException;
 import com.gucci.common.exception.ErrorCode;
 import com.gucci.message_service.client.UserClient;
 import com.gucci.message_service.domain.Message;
+import com.gucci.message_service.domain.MessageType;
 import com.gucci.message_service.dto.MessageResponseDTO;
 import com.gucci.message_service.dto.MessageRoomResponseDTO;
 import com.gucci.message_service.repository.MessageRepository;
@@ -20,6 +21,7 @@ public class MessageService {
 
     private final MessageRepository messageRepository;
     private final UserClient userClient;
+    private final S3Service s3Service;
 
     // 방 리스트 조회
     public List<MessageRoomResponseDTO> getRooms(Long userId) {
@@ -97,9 +99,18 @@ public class MessageService {
 
         // 두 사용자에게 삭제된 메시지 DB에서 삭제
         List<Message> conversationAll = messageRepository.findConversationAll(userId, targetUserId);
-        List<Message> toDelete = new ArrayList<>(conversationAll.stream()
-                .filter(message -> message.isDeletedBySender() && message.isDeletedByReceiver())
-                .toList());
+        List<Message> toDelete = new ArrayList<>();
+
+        for (Message message : conversationAll) {
+            if (message.isDeletedBySender() && message.isDeletedByReceiver()) {
+                // 이미지 파일인 경우 s3에서 삭제
+                if (message.getMessageType() == MessageType.IMAGE) {
+                    s3Service.deleteFile(message.getContent());
+                }
+
+                toDelete.add(message);
+            }
+        }
 
         messageRepository.deleteAll(toDelete);
     }
@@ -119,6 +130,10 @@ public class MessageService {
 
         // 두 사용자에게서 삭제 되었으면 실제 DB에서 삭제
         if (message.isDeletedBySender() && message.isDeletedByReceiver()) {
+            if (message.getMessageType() == MessageType.IMAGE) {
+                s3Service.deleteFile(message.getContent());
+            }
+
             messageRepository.delete(message);
         }
     }
