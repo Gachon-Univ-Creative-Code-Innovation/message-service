@@ -1,6 +1,8 @@
 package com.gucci.message_service.repository;
 
 import com.gucci.message_service.domain.Message;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -25,9 +27,8 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             SELECT m FROM Message m
             WHERE (m.receiverId = :userId AND m.senderId = :targetUserId AND m.deletedByReceiver = false)
             OR (m.receiverId = :targetUserId AND m.senderId =:userId AND m.deletedBySender = false)
-            ORDER BY m.createdAt DESC
             """)
-    List<Message> findConversation(@Param("userId") Long userId, @Param("targetUserId") Long targetUserId);
+    Page<Message> findConversation(@Param("userId") Long userId, @Param("targetUserId") Long targetUserId, Pageable pageable);
 
     @Query("""
              SELECT m FROM Message m

@@ -9,6 +9,10 @@ import com.gucci.message_service.dto.MessageResponseDTO;
 import com.gucci.message_service.dto.MessageRoomResponseDTO;
 import com.gucci.message_service.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -75,16 +79,17 @@ public class MessageService {
 
     // 특정 유저(방)의 전체 메시지 조회
     @Transactional
-    public List<MessageResponseDTO> getMessagesWithTarget(Long userId, Long targetUserId) {
+    public Page<MessageResponseDTO> getMessagesWithTarget(Long userId, Long targetUserId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+
         // 방 입장 시 전체 읽음 처리
         messageRepository.markAllMessagesAsRead(userId, targetUserId);
 
         // 최신 순으로 전체 메시지 조회
-        List<Message> messages = messageRepository.findConversation(userId, targetUserId);
+        Page<Message> messages = messageRepository.findConversation(userId, targetUserId, pageable);
 
-        return messages.stream()
-                .map(this::convertToDTO)
-                .toList();
+        return messages.map(this::convertToDTO);
     }
 
     // 특정 유저와의 대화 전체 삭제
