@@ -74,4 +74,14 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
                 WHERE m.senderId = :userId AND m.receiverId = :targetUserId AND m.deletedBySender = false
             """)
     void softDeleteSentMessages(@Param("userId") Long userId, @Param("targetUserId") Long targetUserId);
+
+    @Query("""
+        SELECT m FROM Message m
+        WHERE ((m.senderId = :userId AND m.receiverId = :targetUserId AND m.deletedBySender = false)
+                OR (m.senderId = :targetUserId AND m.receiverId = :userId AND m.deletedByReceiver = false))
+        AND LOWER(m.content) LIKE LOWER(CONCAT('%', :keyword, '%') )
+        ORDER BY m.createdAt DESC
+        """)
+    List<Message> searchMessages(@Param("userId") Long userId, @Param("targetUserId") Long targetUserId, @Param("keyword") String keyword);
+
 }

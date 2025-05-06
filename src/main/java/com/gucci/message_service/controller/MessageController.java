@@ -40,6 +40,17 @@ public class MessageController {
         return ApiResponse.success(SuccessCode.DATA_FETCHED, messages);
     }
 
+    // 메시지 검색
+    @GetMapping("/with/{targetUserId}/search")
+    public ApiResponse<List<MessageResponseDTO>> searchMessages(Authentication authentication,
+                                                                @PathVariable Long targetUserId,
+                                                                @RequestParam String keyword) {
+        Long userId = authServiceHelper.getCurrentUserId(authentication);
+        List<MessageResponseDTO> searchedMessages = messageService.searchMessagesWithTarget(userId, targetUserId, keyword);
+        return ApiResponse.success(searchedMessages);
+    }
+
+
     // 특정 메시지 삭제
     @DeleteMapping("/{messageId}")
     public ApiResponse<Void> deleteMessage(Authentication authentication,

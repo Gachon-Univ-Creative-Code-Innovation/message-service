@@ -158,4 +158,13 @@ public class MessageService {
                 .createdAt(message.getCreatedAt())
                 .build();
     }
+
+    // 메시지 검색
+    public List<MessageResponseDTO> searchMessagesWithTarget(Long userId, Long targetUserId, String keyword) {
+        List<Message> messages = messageRepository.searchMessages(userId, targetUserId, keyword);
+
+        return messages.stream()
+                .map(this::convertToDTO)
+                .toList();
+    }
 }
