@@ -32,3 +32,6 @@ aws:
 
 jwt:
   secret: ${JWT_SECRET}
+
+user-service:
+  url: http://user-service:8080/api/user-service

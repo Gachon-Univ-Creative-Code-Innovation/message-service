@@ -12,7 +12,7 @@ import java.util.Map;
 
 @FeignClient(
         name = "user-service",
-        url = "http://localhost:8081/api/user-service",
+        url = "${user-service.url}",
         configuration = FeignConfig.class) // 추후 포트 번호 변경 필요
 public interface UserClient {
 

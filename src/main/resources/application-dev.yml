@@ -32,3 +32,6 @@ aws:
 
 jwt:
   secret: ${JWT_SECRET}
+
+user-service:
+  url: http://localhost:8081/api/user-service

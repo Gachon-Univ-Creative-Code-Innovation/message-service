@@ -7,6 +7,7 @@ import com.gucci.message_service.dto.MessageRoomResponseDTO;
 import com.gucci.message_service.service.AuthServiceHelper;
 import com.gucci.message_service.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,12 +31,25 @@ public class MessageController {
 
     // 특정 유저와의 전체 메시지 조회
     @GetMapping("/with/{targetUserId}")
-    public ApiResponse<List<MessageResponseDTO>> getMessagesWithTarget(Authentication authentication,
-                                                                       @PathVariable Long targetUserId) {
+    public ApiResponse<Page<MessageResponseDTO>> getMessagesWithTarget(Authentication authentication,
+                                                                       @PathVariable Long targetUserId,
+                                                                       @RequestParam(defaultValue = "0") int page,
+                                                                       @RequestParam(defaultValue = "20") int size) {
         Long userId = authServiceHelper.getCurrentUserId(authentication);
-        List<MessageResponseDTO> messages = messageService.getMessagesWithTarget(userId, targetUserId);
+        Page<MessageResponseDTO> messages = messageService.getMessagesWithTarget(userId, targetUserId, page, size);
         return ApiResponse.success(SuccessCode.DATA_FETCHED, messages);
     }
+
+    // 메시지 검색
+    @GetMapping("/with/{targetUserId}/search")
+    public ApiResponse<List<MessageResponseDTO>> searchMessages(Authentication authentication,
+                                                                @PathVariable Long targetUserId,
+                                                                @RequestParam String keyword) {
+        Long userId = authServiceHelper.getCurrentUserId(authentication);
+        List<MessageResponseDTO> searchedMessages = messageService.searchMessagesWithTarget(userId, targetUserId, keyword);
+        return ApiResponse.success(searchedMessages);
+    }
+
 
     // 특정 메시지 삭제
     @DeleteMapping("/{messageId}")
