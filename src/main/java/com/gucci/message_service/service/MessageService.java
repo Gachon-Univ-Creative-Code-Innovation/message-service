@@ -167,4 +167,20 @@ public class MessageService {
                 .map(this::convertToDTO)
                 .toList();
     }
+
+    // 메시지 읽음 처리
+    @Transactional
+    public void markAsRead(Long messageId, Long userId) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
+
+        if (!message.getReceiverId().equals(userId)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+
+        if (!message.isRead()) {
+            message.markAsRead();
+            messageRepository.save(message);
+        }
+    }
 }

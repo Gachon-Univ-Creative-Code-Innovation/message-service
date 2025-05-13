@@ -75,6 +75,15 @@ public class MessageController {
         Long userId = authServiceHelper.getCurrentUserId(authentication);
         return ApiResponse.success(messageService.getAllUnreadCount(userId));
     }
+
+    // 메시지 읽음 처리
+    @PatchMapping("{messageId}/read")
+    public ApiResponse<Void> readMessage(Authentication authentication,
+                                         @PathVariable Long messageId) {
+        Long userId = authServiceHelper.getCurrentUserId(authentication);
+        messageService.markAsRead(messageId, userId);
+        return ApiResponse.success();
+    }
 }
 
 

@@ -50,6 +50,10 @@ public class Message {
         }
     }
 
+    public void markAsRead() {
+        this.isRead = true;
+    }
+
     public void markAsDeleteByReceiver() {
         this.deletedByReceiver = true;
     }
