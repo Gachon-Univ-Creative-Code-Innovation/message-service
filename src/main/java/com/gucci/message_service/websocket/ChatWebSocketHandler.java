@@ -74,6 +74,26 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private void handleEnterRoom(Long userId, Long roomId) {
         userInRoom.put(userId, roomId);
         log.info("유저 {} 채팅방 {} 입장", userId, roomId);
+
+        Long targetUserId = roomId;
+        WebSocketSession targetSession = userSessions.get(targetUserId);
+
+        if (targetSession != null && targetSession.isOpen()) {
+            try {
+                Map<String, Object> payload = Map.of(
+                        "type", "ENTER",
+                        "userId", userId,
+                        "roomId", roomId
+                );
+                String json = objectMapper.writeValueAsString(payload);
+                targetSession.sendMessage(new TextMessage(json));
+                log.info("상대방 {} 에게 입장 알림 전송 완료", targetUserId);
+            } catch (IOException e) {
+                log.error("상대방에게 입장 알림 전송 실패", e);
+            }
+        }
+
+
     }
 
     private void handleLeaveRoom(Long userId) {
