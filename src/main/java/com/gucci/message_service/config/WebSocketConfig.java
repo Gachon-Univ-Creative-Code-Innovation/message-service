@@ -17,7 +17,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(chatWebSocketHandler, "/ws/chat")
-                .setAllowedOrigins("http://localhost:5173", "https://a-log.netlify.app");
+                .setAllowedOrigins("http://localhost:5173", "https://a-log.netlify.app","http://43.201.107.237:5173");
 
     }
 }
