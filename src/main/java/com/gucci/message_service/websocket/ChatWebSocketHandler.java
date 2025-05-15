@@ -16,6 +16,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -183,6 +184,12 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             session.getAttributes().put("nickname", nickname);
             userSessions.put(userId, session);
             log.info("WebSocket 인증 성공 - UserId : {}, NickName : {}", userId, nickname);
+
+            // 프론트에 인증 성공 메시지 전송
+            Map<String, Object> authSuccess = new HashMap<>();
+            authSuccess.put("type", "AUTH_SUCCESS");
+            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(authSuccess)));
+
         } else {
             session.close(CloseStatus.POLICY_VIOLATION);
             log.warn("WebSocket 인증 실패 - 유효하지 않은 토큰입니다.");
