@@ -35,3 +35,14 @@ jwt:
 
 user-service:
   url: http://localhost:8081/api/user-service
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+
+  prometheus:
+    metrics:
+      export:
+        enabled: true
