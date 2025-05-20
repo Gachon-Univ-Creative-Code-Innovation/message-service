@@ -53,6 +53,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         }
 
         switch (request.getType()) {
+            case "ping":
+                break;
             case "ENTER":
                 handleEnterRoom(userId,request.getRoomId());
                 break;
