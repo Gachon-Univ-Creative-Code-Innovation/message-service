@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class AuthServiceHelper {
     public Long getCurrentUserId(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new CustomException(ErrorCode.FORBIDDEN);
+            throw new CustomException(ErrorCode.NO_PERMISSION);
         }
 
         return (Long) authentication.getPrincipal();
