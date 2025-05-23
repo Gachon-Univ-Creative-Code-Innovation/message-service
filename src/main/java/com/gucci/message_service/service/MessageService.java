@@ -58,8 +58,9 @@ public class MessageService {
 
             rooms.put(targetId, MessageRoomResponseDTO.builder()
                     .targetUserId(targetId)
-                    .targetNickname(nicknameMap.getOrDefault(targetId,"알 수 없음"))
+                    .targetNickname(nicknameMap.getOrDefault(targetId, "알 수 없음"))
                     .lastMessage(message.getContent())
+                    .lastMessageType(message.getMessageType())
                     .lastMessageTime(message.getCreatedAt())
                     .unreadCount(unreadCounts.getOrDefault(targetId, 0L))
                     .build());
