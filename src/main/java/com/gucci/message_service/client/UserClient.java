@@ -22,4 +22,7 @@ public interface UserClient {
 
     @GetMapping("/nickname")
     ApiResponse<Map<Long, String>> getNicknamesByIds(@RequestParam List<Long> targetIds);
+
+    @GetMapping("/profiles")
+    ApiResponse<Map<Long, String>> getProfilesByIds(@RequestParam List<Long> targetIds);
 }

@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 public class MessageRoomResponseDTO {
     private Long targetUserId; // 상대방 ID
     private String targetNickname; // 상대방 이름
+    private String targetProfileUrl;
     private String lastMessage;
     private MessageType lastMessageType;
     private LocalDateTime lastMessageTime;

@@ -43,6 +43,9 @@ public class MessageService {
         // 닉네임 리스트로 가져오기 (FeignClient)
         Map<Long, String> nicknameMap = userClient.getNicknamesByIds(new ArrayList<>(targetIds)).getData();
 
+        // 프로필 리스트로 가져오기 (FeignClient)
+        Map<Long, String> profileMap = userClient.getProfilesByIds(new ArrayList<>(targetIds)).getData();
+
         // 각 방 별로 최신 메시지만 담기
         Map<Long, MessageRoomResponseDTO> rooms = new LinkedHashMap<>();
 
@@ -59,6 +62,7 @@ public class MessageService {
             rooms.put(targetId, MessageRoomResponseDTO.builder()
                     .targetUserId(targetId)
                     .targetNickname(nicknameMap.getOrDefault(targetId, "알 수 없음"))
+                    .targetProfileUrl(profileMap.getOrDefault(targetId, null))
                     .lastMessage(message.getContent())
                     .lastMessageType(message.getMessageType())
                     .lastMessageTime(message.getCreatedAt())
