@@ -24,7 +24,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: msj9965/alog-message # Message 서비스 이미지 이름
-          tags: | # 태그 전략: main, latest, sha-short
+          tags: |
             type=raw,value=main,enable={{is_default_branch}}
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha,prefix=sha-,format=short
@@ -33,20 +33,21 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile # Message 서비스 레포지토리의 Dockerfile
+          file: ./Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # --- 이 부분을 추가하여 빌드 캐시를 비활성화합니다. ---
+          no-cache: true
 
       - name: Trigger Jenkins CD Pipeline for Message Service
         if: success()
         env:
           JENKINS_URL: ${{ secrets.JENKINS_URL }}
-          JENKINS_JOB_NAME: ${{ secrets.JENKINS_JOB_NAME_MESSAGE }} # Message 서비스용 Jenkins 작업 이름 Secret
-          JENKINS_TRIGGER_TOKEN: ${{ secrets.JENKINS_TRIGGER_TOKEN_MESSAGE }} # Message 서비스용 Jenkins 트리거 토큰 Secret
+          JENKINS_JOB_NAME: ${{ secrets.JENKINS_JOB_NAME_MESSAGE }}
+          JENKINS_TRIGGER_TOKEN: ${{ secrets.JENKINS_TRIGGER_TOKEN_MESSAGE }}
           JENKINS_USER_ID: ${{ secrets.JENKINS_USER_ID }}
           JENKINS_USER_API_TOKEN: ${{ secrets.JENKINS_USER_API_TOKEN }}
-          # Jenkins에 전달할 이미지 태그 (여기서는 'main' 태그를 사용)
           IMAGE_TO_DEPLOY_TAG: main
         run: |
           echo "Triggering Jenkins job: '${JENKINS_JOB_NAME}' for Message Service with image tag: '${IMAGE_TO_DEPLOY_TAG}'"
