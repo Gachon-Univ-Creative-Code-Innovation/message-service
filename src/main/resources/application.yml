@@ -1,11 +1,10 @@
 spring:
   application:
     name: message-service
-
   config:
-    activate:
-      on-profile: cloud
-    import: "optional:configserver:http://config-service.config.svc.cluster.local:8888"
+    import: "optional:configserver:"
+  profiles:
+    active: cloud
 
 logging:
   level:
