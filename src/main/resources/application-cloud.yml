@@ -7,7 +7,6 @@ spring:
       name: message-service
       label: main
       fail-fast: true
-  application:
-    name: message-service
+
 
 
