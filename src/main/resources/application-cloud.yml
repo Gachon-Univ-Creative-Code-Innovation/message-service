@@ -7,6 +7,3 @@ spring:
       name: message-service
       label: main
       fail-fast: true
-
-
-

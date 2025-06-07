@@ -24,6 +24,9 @@ spec:
             - containerPort: 8011
           # envFrom 대신 env를 사용하여 각 환경 변수를 명시적으로 주입합니다.
           env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: cloud
+
             # --- ConfigMap (message-service-config)에서 가져올 값들 ---
             - name: KAFKA_BOOTSTRAP_SERVERS
               valueFrom:
