@@ -48,7 +48,7 @@ jobs:
           JENKINS_TRIGGER_TOKEN: ${{ secrets.JENKINS_TRIGGER_TOKEN_MESSAGE }}
           JENKINS_USER_ID: ${{ secrets.JENKINS_USER_ID }}
           JENKINS_USER_API_TOKEN: ${{ secrets.JENKINS_USER_API_TOKEN }}
-          IMAGE_TO_DEPLOY_TAG: main
+          IMAGE_TO_DEPLOY_TAG: ${{ steps.meta.outputs.version }}
         run: |
           echo "Triggering Jenkins job: '${JENKINS_JOB_NAME}' for Message Service with image tag: '${IMAGE_TO_DEPLOY_TAG}'"
           curl -X POST -u "${JENKINS_USER_ID}:${JENKINS_USER_API_TOKEN}" \
