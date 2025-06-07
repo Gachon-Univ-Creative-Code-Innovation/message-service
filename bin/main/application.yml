@@ -1,15 +1,49 @@
 spring:
-  config:
-    import: optional:configserver:http://config-service.config.svc.cluster.local:8888
+  # datasource, jpa, kafka 설정은 이전과 동일하게 유지...
+  datasource:
+    url: ${CLOUD_DB_URL}
+    username: ${CLOUD_DB_USERNAME}
+    password: ${CLOUD_DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS} # ConfigMap에서 가져오도록 변경
+    consumer:
+      group-id: alarm-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    topic:
+      notification: ${KAFKA_TOPIC_NOTIFICATION} # ConfigMap에서 가져오도록 변경
 
-  application:
-    name: message-service
+aws:
+  s3:
+    bucket: ${AWS_S3_BUCKET} # ConfigMap에서 가져오도록 변경
+    region: ${AWS_S3_REGION} # ConfigMap에서 가져오도록 변경
+    access-key: ${AWS_ACCESS_KEY} # Secret에서 가져옴
+    secret-key: ${AWS_SECRET_KEY} # Secret에서 가져옴
 
-  cloud:
-    config:
-      name: message-service
-      label: main
-      fail-fast: true
+jwt:
+  secret: ${JWT_SECRET} # Secret에서 가져옴
 
-  profiles:
-    active: cloud
+# Feign Client URL을 환경 변수에서 가져오도록 명확히 설정
+user-service:
+  url: ${USER_SERVICE_URL} # <<< 중요: ConfigMap의 키와 일치시킴
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+server:
+  port: 8011
