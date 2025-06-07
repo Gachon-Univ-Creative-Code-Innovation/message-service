@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: message-service
-          image: msj9965/alog-message:main # CI/CD 파이프라인에서 업데이트될 이미지
+          image: 216989113314.dkr.ecr.ap-northeast-2.amazonaws.com/alog/message-service:latest
           ports:
             - containerPort: 8011
           # envFrom 대신 env를 사용하여 각 환경 변수를 명시적으로 주입합니다.
