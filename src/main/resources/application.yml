@@ -3,8 +3,6 @@ spring:
     name: message-service
   config:
     import: "optional:configserver:"
-  profiles:
-    active: cloud
 
 logging:
   level:
