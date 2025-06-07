@@ -3,10 +3,8 @@ kind: Deployment
 metadata:
   name: message-service
   namespace: message
-  labels:
-    app: message-service
 spec:
-  replicas: 1 # Pod를 2개 실행하여 가용성 확보
+  replicas: 1
   selector:
     matchLabels:
       app: message-service
@@ -14,7 +12,6 @@ spec:
     metadata:
       labels:
         app: message-service
-      # Prometheus가 메트릭을 수집할 수 있도록 어노테이션 추가
       annotations:
         prometheus.io/scrape: 'true'
         prometheus.io/port: '8011'
@@ -22,26 +19,82 @@ spec:
     spec:
       containers:
         - name: message-service
-          # 중요! 실제 빌드한 Docker 이미지 주소로 변경해주세요.
-          image: msj9965/alog-message:main
+          image: msj9965/alog-message:main # CI/CD 파이프라인에서 업데이트될 이미지
           ports:
-            - containerPort: 8011 # application.yml에 설정된 서버 포트
-          envFrom:
-            # 위에서 정의한 ConfigMap과 Secret의 모든 데이터를 환경변수로 주입
-            - configMapRef:
-                name: message-service-config
-            - secretRef:
-                name: message-service-secret
-          # Pod의 상태를 주기적으로 확인하여 자동 복구 및 안정적인 서비스 보장
-          readinessProbe: # Pod가 트래픽을 받을 준비가 되었는지 확인
+            - containerPort: 8011
+          # envFrom 대신 env를 사용하여 각 환경 변수를 명시적으로 주입합니다.
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: cloud
+
+            # --- ConfigMap (message-service-config)에서 가져올 값들 ---
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: message-service-config
+                  key: KAFKA_BOOTSTRAP_SERVERS
+            - name: USER_SERVICE_URL # <<< 중요: 애플리케이션이 필요로 하는 값
+              valueFrom:
+                configMapKeyRef:
+                  name: message-service-config
+                  key: USER_SERVICE_URL
+            - name: AWS_S3_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: message-service-config
+                  key: AWS_S3_BUCKET
+            - name: AWS_S3_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: message-service-config
+                  key: AWS_S3_REGION
+            - name: KAFKA_TOPIC_NOTIFICATION
+              valueFrom:
+                configMapKeyRef:
+                  name: message-service-config
+                  key: KAFKA_TOPIC_NOTIFICATION
+
+            # --- Secret (message-service-secret)에서 가져올 값들 ---
+            - name: CLOUD_DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: message-service-secret
+                  key: CLOUD_DB_URL
+            - name: CLOUD_DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: message-service-secret
+                  key: CLOUD_DB_USERNAME
+            - name: CLOUD_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: message-service-secret
+                  key: CLOUD_DB_PASSWORD
+            - name: AWS_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: message-service-secret
+                  key: AWS_ACCESS_KEY
+            - name: AWS_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: message-service-secret
+                  key: AWS_SECRET_KEY
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: message-service-secret
+                  key: JWT_SECRET
+
+          readinessProbe:
             httpGet:
               path: /actuator/health/readiness
               port: 8011
-            initialDelaySeconds: 30 # 컨테이너 시작 후 30초 뒤에 첫 확인
-            periodSeconds: 10 # 10초마다 확인
-          livenessProbe: # Pod가 살아있는지(정상 동작하는지) 확인
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
             httpGet:
               path: /actuator/health/liveness
               port: 8011
-            initialDelaySeconds: 60 # 컨테이너 시작 후 60초 뒤에 첫 확인
-            periodSeconds: 15 # 15초마다 확인
+            initialDelaySeconds: 60
+            periodSeconds: 15
