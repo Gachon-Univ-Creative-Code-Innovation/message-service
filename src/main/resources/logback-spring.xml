@@ -1,29 +1,11 @@
 <configuration>
 
-<!-- JSON 로그용 Appender (prod 전용) -->
-<appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
-</appender>
+    <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+    </appender>
 
-<!-- 일반 텍스트 로그용 Appender (!prod 전용) -->
-<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder>
-        <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %highlight(%-5level) %logger{36} - %msg%n</pattern>
-    </encoder>
-</appender>
-
-<!-- prod 환경에서는 JSON 로그 -->
-<springProfile name="cloud">
     <root level="INFO">
-        <appender-ref ref="JSON_CONSOLE"/>
+        <appender-ref ref="JSON_CONSOLE" />
     </root>
-</springProfile>
-
-<!-- dev 등 나머지 환경에서는 일반 로그 -->
-<springProfile name="!cloud">
-    <root level="INFO">
-        <appender-ref ref="CONSOLE"/>
-    </root>
-</springProfile>
 
 </configuration>

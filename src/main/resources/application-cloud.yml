@@ -7,3 +7,6 @@ spring:
       name: message-service
       label: main
       fail-fast: true
+
+server:
+  port: 8011
