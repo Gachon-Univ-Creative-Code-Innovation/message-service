@@ -25,9 +25,9 @@ public class MessageController {
 
     //health check
     @GetMapping("/health-check")
-    public ApiResponse<String> healthCheck() {
+    public String healthCheck() {
         String port = environment.getProperty("local.server.port");
-        return ApiResponse.success("Message Service is running on port: " + (port != null ? port : "unknown"));
+        return  "Message Service is up and running on port: " + port;
     }
 
     // 방 리스트 조회
