@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: message-service-deployment
+  name: message-service
   namespace: message
   labels:
     app: message-service
 spec:
-  replicas: 2 # Pod를 2개 실행하여 가용성 확보
+  replicas: 1 # Pod를 2개 실행하여 가용성 확보
   selector:
     matchLabels:
       app: message-service
