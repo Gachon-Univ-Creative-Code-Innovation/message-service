@@ -11,5 +11,5 @@ spring:
       label: main
       fail-fast: true
 
-profiles:
-  active: cloud
+  profiles:
+    active: cloud
