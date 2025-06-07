@@ -23,6 +23,7 @@ public class MessageController {
     private final AuthServiceHelper authServiceHelper;
     private final Environment environment;
 
+    //health check
     @GetMapping("/health-check")
     public ApiResponse<String> healthCheck() {
         String port = environment.getProperty("local.server.port");
