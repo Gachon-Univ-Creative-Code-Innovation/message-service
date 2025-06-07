@@ -19,7 +19,8 @@ spec:
     spec:
       containers:
         - name: message-service
-          image: 216989113314.dkr.ecr.ap-northeast-2.amazonaws.com/alog/message-service:latest
+#          image: 216989113314.dkr.ecr.ap-northeast-2.amazonaws.com/alog/message-service:latest
+          image: msj9965/alog-message:main # Docker Hub에 이 이름과 태그로 이미지가 있는지 확인
           ports:
             - containerPort: 8011
           # envFrom 대신 env를 사용하여 각 환경 변수를 명시적으로 주입합니다.
