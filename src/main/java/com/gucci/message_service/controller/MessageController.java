@@ -7,6 +7,7 @@ import com.gucci.message_service.dto.MessageRoomResponseDTO;
 import com.gucci.message_service.service.AuthServiceHelper;
 import com.gucci.message_service.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,13 @@ public class MessageController {
 
     private final MessageService messageService;
     private final AuthServiceHelper authServiceHelper;
+    private final Environment environment;
+
+    @GetMapping("/health-check")
+    public ApiResponse<String> healthCheck() {
+        String port = environment.getProperty("local.server.port");
+        return ApiResponse.success("Message Service is running on port: " + (port != null ? port : "unknown"));
+    }
 
     // 방 리스트 조회
     @GetMapping("/rooms")
