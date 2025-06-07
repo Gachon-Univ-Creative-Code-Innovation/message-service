@@ -1,12 +1,16 @@
 spring:
+  application:
+    name: message-service
+
   config:
-    import: "optional:configserver:http://config-service.config.svc.cluster.local:8888"
+    import: optional:configserver:http://config-service.config.svc.cluster.local:8888
+
   cloud:
     config:
       name: message-service
       label: main
       fail-fast: true
-  application:
-    name: message-service
-  profiles:
-    active: cloud
+
+
+profiles:
+  active: cloud
