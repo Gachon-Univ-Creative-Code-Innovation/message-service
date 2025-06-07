@@ -9,6 +9,5 @@ spring:
       fail-fast: true
   application:
     name: message-service
-  profiles:
-    active: cloud
+
 
