@@ -13,10 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Verify application-cloud.yml content
-        run: |
-            echo "--- Verifying content of src/main/resources/application-cloud.yml ---"
-            cat src/main/resources/application-cloud.yml
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -44,27 +40,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           # --- 이 부분을 추가하여 빌드 캐시를 비활성화합니다. ---
           no-cache: true
-      - name: Inspect Image Content
-        run: |
-            echo "--- Inspecting the content of the newly pushed image ---"
-            # 고유한 SHA 태그를 사용하여 검사할 이미지를 지정합니다.
-            IMAGE_TO_INSPECT=msj9965/alog-message:${{ steps.meta.outputs.version }}
-            echo "Pulling image: ${IMAGE_TO_INSPECT}"
-            docker pull ${IMAGE_TO_INSPECT}
-            
-            echo "Creating a temporary container to extract the JAR file..."
-            # 컨테이너를 시작하지 않고 생성만 합니다.
-            CONTAINER_ID=$(docker create ${IMAGE_TO_INSPECT})
-            
-            echo "Copying app.jar from the container..."
-            docker cp ${CONTAINER_ID}:/app/app.jar ./app.jar
-            
-            echo "Removing the temporary container..."
-            docker rm -f ${CONTAINER_ID}
-            
-            echo "--- Content of application-cloud.yml from INSIDE the JAR file ---"
-            # unzip 명령어를 사용하여 JAR 파일 내의 특정 파일 내용을 출력합니다.
-            unzip -p ./app.jar BOOT-INF/classes/application-cloud.yml || echo "Could not find application-cloud.yml inside the JAR"
+
 
       - name: Trigger Jenkins CD Pipeline for Message Service
         if: success()
