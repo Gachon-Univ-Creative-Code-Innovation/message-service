@@ -1,5 +1,11 @@
 spring:
   application:
     name: message-service
+  config:
+    import: "optional:configserver:"
   profiles:
     active: cloud
+
+logging:
+  level:
+    org.springframework.boot.context.config: debug
