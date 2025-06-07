@@ -1,11 +1,17 @@
+
+
 spring:
-  application:
-    name: message-service
   config:
     import: "optional:configserver:"
+  cloud:
+    config:
+      uri: http://config-service.config.svc.cluster.local:8888
+      #      uri: http://localhost:8888
+      name: message-service
+      label: main
+      fail-fast: true
+  application:
+    name: message-service
   profiles:
     active: cloud
 
-logging:
-  level:
-    org.springframework.boot.context.config: debug
